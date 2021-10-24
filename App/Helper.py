@@ -3,6 +3,7 @@ import numpy as np
 import cv2
 from math import *
 import shutil
+import Objects
 
 class Helper:
 
@@ -151,5 +152,33 @@ class Helper:
             sum += distance(a,point)
         return sum
 
+    @staticmethod
+    def preprocessImages(images_path):
+        images = Helper.load_images_from_folder(images_path)
 
-# détecter convexité cv2
+        for index, image in enumerate(images):
+            # Resizing de l'image en 100x100
+            image = cv2.resize(image, (100,100), interpolation=cv2.INTER_LINEAR) # Vérifier les autres types d'interpolation
+
+            # Binarisation et utilisation de OTSU pour déterminer le seuil automatiquement
+            _, image = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU) # Ne detecte que les flèches noires, il faut modifier le param 2 et 3 pour inverser cela et ajouter l'inverse de l'image
+            
+            # Ajouter un convexHull pour rendre l'image convex et faciliter le traitement
+
+            # Remplace l'ancienne image par la nouvelle
+            images[index] = image
+
+            # Sauvegarde les images
+            cv2.imwrite(images_path+'/resultats/image_{}.png'.format(index), image)
+        
+        return images
+
+    """
+        Génère la liste des objets des images injectées en argument 
+    """
+    def generateObjects(images):
+        liste = []
+        for image in images:
+            object = Objects(image)
+            liste.append(object)
+        return liste

@@ -21,18 +21,27 @@ class PhiDescriptor:
     def __init__(self, objects=[]):
         self.objects = objects # [(A,B), (C, D), ...]
 
-    def FHistogramme(self, theta):
+    def _FHistogramme(self, theta):
         # Définir les connected Components
         pass
 
-    def AllenHistogramm(self):
+    def _AllenHistogramm(self):
         pass
 
-    def getAreaFHistogramme(self):
+    def _getAreaFHistogramme(self):
         pass
 
-    def lengthHistogramme(self):
+    def _lengthHistogramme(self):
         pass
 
-    def getPhiDescriptor(self):
+    """
+        Arguments : 
+            - (Object) index1 -> position dans objects de l'objet 1
+            - (Objects) index2 -> position dans objects de l'objet 2
+        
+        Return :
+            - (string) Définition de la relation entre les objects
+    """
+    def _getPhiDescriptor(self, index1, index2):
+        # vérifier que les objets appartiennent bien à la meme image
         pass
