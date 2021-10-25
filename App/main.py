@@ -1,11 +1,8 @@
 import Helper
-from PhiDescriptor import *
 
 images = Helper.preprocessImages("./images")
-objects = Helper.generateObjects(images)
+objects = Helper.convertImagesToObjects(images)
 
-phi = PhiDescriptor(objects)
+relation = objects[0].getRelationWith(objects[1])
 
-relation =  phi.getPhiDescriptor(objects[0], objects[1])
-
-print(relation) 
+print(relation)

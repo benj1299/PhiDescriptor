@@ -163,6 +163,8 @@ class Helper:
             # Binarisation et utilisation de OTSU pour déterminer le seuil automatiquement
             _, image = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU) # Ne detecte que les flèches noires, il faut modifier le param 2 et 3 pour inverser cela et ajouter l'inverse de l'image
             
+            # Ne récuperer que les contours pour ne travailler que sur les pixels à 255 par exemple
+            
             # Ajouter un convexHull pour rendre l'image convex et faciliter le traitement
 
             # Remplace l'ancienne image par la nouvelle
@@ -176,9 +178,9 @@ class Helper:
     """
         Génère la liste des objets des images injectées en argument 
     """
-    def generateObjects(images):
+    def convertImagesToObjects(images):
         liste = []
         for image in images:
-            object = Objects(image)
+            object = Object(image)
             liste.append(object)
         return liste
