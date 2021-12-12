@@ -32,19 +32,34 @@ class PhiDescriptor:
         {"AB-A": ["starts", "follows", "leads", "trails"]}, 
         {"AB-B": ["starts", "follows", "leads", "trails"]}, 
         {"AB-AB": ["starts", "follows", "leads", "trails"]}
-        ] # Certaines points paris peuvent être ignorées car redondantes avec d'autres
+        ] # Certaines points pairs peuvent être ignorées car redondantes avec d'autres
 
-    def __init__(self, objects=[]):
-        self.objects = objects # ensemble des objets de l'espace euclidien [(A,B), (C, D), ...]
+    def __init__(self, object1, object2):
+        self.objects = [object1, object2] # ensemble des objets de l'espace euclidien [(A,B), (C, D), ...]
         
-        #self.spacial = object[0].shape # Ensemble représentant l'espace euclidien entier (longueur, largeur)
+        # self.spacial = object[0].shape # Ensemble représentant l'espace euclidien entier (longueur, largeur)
         # Vérifier que objects n'est pas vide et que l'image est la meme entre les objets
 
+    """
+        Renvoies la liste des 
+    """
     def _FHistogramme(self, theta):
-        # Faire un boucle sur toute l'ordonnée de l'image
-        # Récolter les positions ou theta(p) intersect l(es)'objet(s)
-        # Renvoyer le tableau
-        pass
+        histogram = []
+        rows, cols = self.objects[0].image.shape if self.objects[0].image.shape == self.objects[1].image.shape else None
+        
+        if rows == None:
+            return "Les tailles d'image doivent être les memes"
+
+
+        for row in range(rows):
+            for col in range(cols):
+                pixel = self.objects[0][row, col]
+                if pixel == 0:
+                    histogram.append(pixel)
+
+        # Bresenham
+        
+        return histogram
 
     def _AllenHistogramm(self):
         pass
@@ -63,6 +78,6 @@ class PhiDescriptor:
         Return :
             - (string) Définition de la relation entre les objects
     """
-    def _getPhiDescriptor(self, index1, index2):
+    def getPhiDescriptor(self):
         # vérifier que les objets appartiennent bien à la meme image
         pass

@@ -1,15 +1,29 @@
-version: "3.2"
-
-networks:
-  web-net:
+version: "3.9"
 
 services:
-  app:
-    container_name: app
-    build: ./App
-    entrypoint: /bin/sh
-    stdin_open: true
-    tty: true
-    volumes: 
-      - "./App:/usr/src/App"
-    restart: always
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_NAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+
+  web:
+    build: ./Web
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./Web:/code
+    ports:
+      - "8000:8000"
+    environment:
+      - POSTGRES_NAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    depends_on:
+      - db
+
+networks:
+  web_network:  
+    driver: bridge

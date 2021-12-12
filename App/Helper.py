@@ -157,18 +157,16 @@ class Helper:
         images = Helper.load_images_from_folder(images_path)
 
         for index, image in enumerate(images):
-            # Resizing de l'image en 100x100
+            # Resizing de l'image en 100x100 # image carré
             image = cv2.resize(image, (100,100), interpolation=cv2.INTER_LINEAR) # Vérifier les autres types d'interpolation
 
             # Binarisation et utilisation de OTSU pour déterminer le seuil automatiquement
-            _, image = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU) # Ne detecte que les flèches noires, il faut modifier le param 2 et 3 pour inverser cela et ajouter l'inverse de l'image
-            
-            # Ne récuperer que les contours pour ne travailler que sur les pixels à 255 par exemple
+            _, binary = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU) # Ne detecte que les flèches noires, il faut modifier le param 2 et 3 pour inverser cela et ajouter l'inverse de l'image
             
             # Ajouter un convexHull pour rendre l'image convex et faciliter le traitement
 
             # Remplace l'ancienne image par la nouvelle
-            images[index] = image
+            images[index] = c
 
             # Sauvegarde les images
             cv2.imwrite(images_path+'/resultats/image_{}.png'.format(index), image)
