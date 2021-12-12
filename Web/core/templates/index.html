@@ -15,26 +15,27 @@
 
         <div class="py-5 text-center">
             <img class="d-block mx-auto mb-4" src="{% static 'images/logo.png' %}" alt="" width="72" height="72">
-            <h3>Envoyer une image pour obtenir automatique les relations spatiales existantes entre les objets de l'image</h3>
+            <h3>Envoyer une image pour obtenir automatiquement les relations spatiales existantes entre les objets de l'image</h3>
         </div>
 
         <div class="row">
+            {% if relation %}
             <div class="col-md-4 order-md-2 mb-4">
-            <h4 class="d-flex justify-content-between align-items-center mb-3">
-                <span class="text-muted">Résultats :</span>
-                <span class="badge badge-secondary badge-pill">3</span>
-            </h4>
-            <ul class="list-group mb-3">
-                <li class="list-group-item d-flex justify-content-between lh-condensed">
-                <div>
-                    <h6 class="my-0">Obj 1 au dessus de Obj2</h6>
-                    <small class="text-muted">Via Phi Descripteur</small>
-                </div>
-                <span class="text-muted">83%</span>
-                </li>
-            </ul>
-
+                <h4 class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted">Résultats :</span>
+                    <span class="badge badge-secondary badge-pill">3</span>
+                </h4>
+                <ul class="list-group mb-3">
+                    <li class="list-group-item d-flex justify-content-between lh-condensed">
+                    <div>
+                        <h6 class="my-0">{{ relation }}</h6>
+                        <small class="text-muted">Via Phi Descripteur</small>
+                    </div>
+                    <span class="text-muted">83%</span>
+                    </li>
+                </ul>
             </div>
+            {% endif %}
             <div class="col-md-8 order-md-1">
                 <h4 class="mb-3">Méthode du Phi Descripteur</h4>
                 <form method="post" action="/">
@@ -49,7 +50,6 @@
                 </form>   
             </div>
         </div>
-
         <footer class="my-5 pt-5 text-muted text-center text-small">
             <p class="mb-1">Réalisé par Benjamin Kauffmann et Julien Champagne</p>
             <ul class="list-inline">
