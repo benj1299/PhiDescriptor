@@ -1,8 +1,8 @@
 # -*-coding:utf-8 -*
 from Helper import Helper
 
-images = Helper.preprocessImages("./images")
-objects = Helper.convertImagesToObjects(images)
+image = Helper.preprocessImage("./images/logo.png")
+objects = Helper.convertImageToObjects(image)
 
 relation = objects[0].getRelationWith(objects[1])
 

@@ -1,11 +1,13 @@
 from .PhiDescriptor import *
+import uuid
 
 class Object:
 
-    def __init__(self, image):
+    def __init__(self, image, component):
         self.image = image
-        self.positions = [] # ensemble des positions de l'objet dans l'image
-        self.core = [] # Ensemble des points d'intersection de la ligne theta(p)
+        self.component = component
+        self.id = uuid.uuid4()
+        self.points = [] # Liste les points d'intersection
 
     def getRelationWith(self, object):
         phi = PhiDescriptor(self, object)
