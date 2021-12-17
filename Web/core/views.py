@@ -6,7 +6,6 @@ import os
 
 def index(request):
     relation = None
-    accuracy = None
     if request.method == 'POST' and request.FILES['image']:
         upload = request.FILES['image']
         fss = FileSystemStorage()
@@ -15,10 +14,9 @@ def index(request):
 
         image = Helper.preprocessImage(os.getcwd() + file_url)
         objects = Helper.convertImageToObjects(image)
-        relation, accuracy = objects[0].getRelationWith(objects[1]) if len(objects) > 1 else "Un seul objet détecté", "100"        
+        relation = objects[0].getRelationWith(objects[1]) if len(objects) > 1 else "Un seul objet détecté", "100"        
 
     context = {
-        "relation": relation,
-        "accuracy": accuracy
+        "relation": relation
     }
     return render(request, "index.html", context)

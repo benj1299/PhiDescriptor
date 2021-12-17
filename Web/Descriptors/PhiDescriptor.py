@@ -18,8 +18,6 @@ P13 - Consider four objects A, B, A' and B' ; whether there exists an affine tra
 
 """
 import numpy as np
-import cv2
-from .Helper import *
 from scipy.integrate import quad
 import numpy as np
 from shapely.geometry import Point
@@ -206,21 +204,6 @@ class PhiDescriptor:
     def __init__(self, object1, object2):
         self.objects = [object1, object2]
         self.theta = np.pi/2
-
-    """
-        Calcule le F-Histogram se basant sur https://www.scitepress.org/Papers/2012/37816/37816.pdf
-        La densité de masse de A/B au point p/q est le degré d'appartenance A/B(p)
-        On retourne ici l'intégrale de toutes les forces infinidécimales
-    """
-    def _FHistogramme(self, obj1, obj2):
-        forces = []
-        for p in obj1.points:
-            for q in obj2.points:
-                if p.id != q.id:
-                    vector = Helper.createVector(p["coordonates"]["x"], q["coordonates"]["x"], p["coordonates"]["y"], q["coordonates"]["y"], self.objects[0].image)
-                    magnitude = (p["weight"] * q["weight"])/np.linalg.norm(vector) 
-                    forces.append(magnitude * Helper.unit_vector(vector))
-        return quad(forces)
     
     """
         Renvoie un tableau contenant les aires de chaque catégorie
@@ -236,7 +219,6 @@ class PhiDescriptor:
                 if output is not None:
                     name, denominateur = output
                 if denominateur is not None:
-                    raise Exception(self._getPointCategory(p,q))
                     divider += 1 if denominateur != 0 else 0
                     if name == "width":
                         result.append({"force": np.linalg.norm(p,q)/denominateur, "divider": divider, "name": name})
@@ -250,57 +232,66 @@ class PhiDescriptor:
     """
     def _getLengthHistogram(self, area, category):
         return area["force"]/area["divider"]
-        
+    
+    """
+        Fonction de Dirac
+    """
+    def dirac(self, x):
+        if x == 0:
+            return 0
+        else:
+            return 1
+
     """
         Construit les 12 catégories de points
         Renvoie la matrice correspondante
     """
-    def _buildPointCategory(self, p,q):  
+    def _buildPointCategory(self, p, q, p1, p2):  
         category_matrix = []  
         join = True
 
-        if p["object"].component["polygon"].contains(q):
+        if p1["object"].component["polygon"].contains(q):
             # q in p.polygon
             join = False
-            if q["type"] == 0:
+            if p2["type"] == 0:
                 category_matrix = [[0,1], [1,1]]
             else:
                 category_matrix = [[1,0], [1,1]]
         else:
             # q not in p.polygon 
             join = False
-            if q["type"] == 0:
+            if p2["type"] == 0:
                 category_matrix = [[0,1], [0,0]]
             else:
                 category_matrix = [[1,0], [0,0]]
 
-        if q["object"].component["polygon"].contains(p):
+        if p2["object"].component["polygon"].contains(p):
             # p in q.polygon
             join = False
-            if p["type"] == 0:
+            if p1["type"] == 0:
                 category_matrix = [[1,1], [0,1]]
             else:
                 category_matrix = [[1,1], [1,0]]
         else:
             # p not in q.polygon
             join = False
-            if p["type"] == 0:
+            if p1["type"] == 0:
                 category_matrix = [[0,0], [0,1]]
             else:
                 category_matrix = [[0,0], [1,0]]
 
-        if p["object"].id != q["object"].id and join:
+        if p1["object"].id != p2["object"].id and join:
             # AB entry/entry ou exit/exit
-            if p["type"] == q["type"]:
+            if p1["type"] == p2["type"]:
                 if p["type"] == 0:
                     category_matrix = [[0,1], [0,1]]
                 else:
                     category_matrix = [[1,0], [1,0]]
             # AB entry/exit ou exit/entry
             else:
-                if p["type"] == 0 and q["type"] == 1:
+                if p1["type"] == 0 and p2["type"] == 1:
                     category_matrix = [[0,1], [1,0]]
-                if p["type"] == 1 and p["type"] == 0:
+                if p1["type"] == 1 and p2["type"] == 0:
                     category_matrix = [[1,0], [0,1]]
 
         return category_matrix
@@ -308,26 +299,32 @@ class PhiDescriptor:
     """
         Renvoie le numéro de la catégorie appartenant aux points donnés en entrée
     """
-    def _getPointCategory(self, p, q):
+    def _getPointCategory(self, p1, p2):
         category_number = -1
         category_name = ""
         category_value = None
 
         # Revoies None si q n'est pas le successeur de p
-        if p["intersection_number"] >= q["intersection_number"] or p["coordonates"]["x"] != p["coordonates"]["x"]:
+        if p1["intersection_number"] >= p2["intersection_number"] or p1["coordonates"]["x"] != p2["coordonates"]["x"]:
             return None
         
-        p = Point(p["coordonates"]["x"], p["coordonates"]["y"]) # B
-        q = Point(q["coordonates"]["x"], q["coordonates"]["y"]) # A
+        p = Point(p1["coordonates"]["x"], p1["coordonates"]["y"]) # B
+        q = Point(p2["coordonates"]["x"], p2["coordonates"]["y"]) # A
 
         # Construit les catégories de chaque point 
-        p_category = self._buildPointCategory(p,q)
-        q_category = self._buildPointCategory(q,p)
+        p_category = self._buildPointCategory(p,q, p1, p2)
+        q_category = self._buildPointCategory(q,p, p1, p2)
 
         # Applatit puis transforme le tableau pour faire des comparaisons
-        pq_category = np.array([ [p_category[0][0], p_category[1][0]], [Helper.dirac(p_category[0][1] + q_category[0][0]), Helper.dirac(p_category[1][1] + q_category[1][0])], [q_category[0][1], q_category[1][1]] ])
-        valueToIndex = lambda x: x.index+1 if x == 1 else None
-        pg_flat = valueToIndex(pq_category.flatten())
+        pq_category = np.array([ [p_category[0][0], p_category[1][0]], [self.dirac(p_category[0][1] + q_category[0][0]), self.dirac(p_category[1][1] + q_category[1][0])], [q_category[0][1], q_category[1][1]] ])
+        pg_flat = pq_category.flatten()
+        for ind, c in enumerate(pg_flat):
+            if c == 1:
+                pg_flat[ind] = ind + 1
+            else:
+                None
+
+        pg_flat = list(pg_flat[pg_flat != 0])
 
         # Permet d'obtenir le numéro de la categorie
         for idx, cat in enumerate(self.TOTAL_CATEGORIES):
@@ -401,5 +398,6 @@ class PhiDescriptor:
                 "length": self._getLengthHistograms(area),
                 })
 
+        raise Exception(phi)
         # retourner la position et sa précision
         return "a au dessus de b", "100"

@@ -26,15 +26,8 @@ class Helper:
     def unit_vector(vector):
         return vector / np.linalg.norm(vector)
     
-    """
-        Fonction de Dirac
-    """
-    @staticmethod
-    def dirac(x):
-        if x == 0:
-            return 0
-        else:
-            return 1
+    
+    
 
     @staticmethod
     def preprocessImage(image_path):
@@ -44,7 +37,7 @@ class Helper:
         #image = cv2.resize(image, (100,100), interpolation=cv2.INTER_LINEAR) # Vérifier les autres types d'interpolation
 
         # Binarisation et utilisation de OTSU pour déterminer le seuil automatiquement
-        _, image = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+        _, gray = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
 
         # Sauvegarde les images
         #cv2.imwrite(image_path, image)
@@ -56,7 +49,6 @@ class Helper:
     @staticmethod
     def convertImageToObjects(image):
         objects = []
-        
         contours,_ = cv2.findContours(image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         for cnt in contours :
             pts = []
