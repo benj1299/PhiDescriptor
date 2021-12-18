@@ -398,6 +398,8 @@ class PhiDescriptor:
                 "length": self._getLengthHistograms(area),
                 })
 
-        raise Exception(phi)
+        # Pour voir le contenu de la variable phi dans le navigateur
+        # raise Exception(phi)
+
         # retourner la position et sa précision
         return "a au dessus de b", "100"
