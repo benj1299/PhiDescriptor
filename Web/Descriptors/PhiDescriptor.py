@@ -161,7 +161,6 @@ class PhiDescriptor:
             "numbers": []
         }
     }
-
     TOTAL_CATEGORIES = [
         [2],
         [1, 3],
@@ -200,7 +199,6 @@ class PhiDescriptor:
         [2, 4, 6],
         [1, 3, 4, 6]
     ]
-
     def __init__(self, object1, object2):
         self.objects = [object1, object2]
         self.theta = np.pi/2
@@ -317,6 +315,7 @@ class PhiDescriptor:
 
         # Applatit puis transforme le tableau pour faire des comparaisons
         pq_category = np.array([ [p_category[0][0], p_category[1][0]], [self.dirac(p_category[0][1] + q_category[0][0]), self.dirac(p_category[1][1] + q_category[1][0])], [q_category[0][1], q_category[1][1]] ])
+        
         pg_flat = pq_category.flatten()
         for ind, c in enumerate(pg_flat):
             if c == 1:
@@ -330,7 +329,7 @@ class PhiDescriptor:
         for idx, cat in enumerate(self.TOTAL_CATEGORIES):
             if cat == pg_flat:
                 category_number = idx+1
-        
+
         for item in self.CATEGORIES.items():
             name, category = item
             if category_number in category["numbers"]:
